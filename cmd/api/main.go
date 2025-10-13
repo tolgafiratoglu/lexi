@@ -5,9 +5,20 @@ import (
     "log"
     "net/http"
     "os"
+	"github.com/tolgafiratoglu/lexi/internal/infrastructure/database"
 )
 
 func main() {
+	db, dsn, err := database.Connect()
+    if err != nil {
+        log.Fatalf("❌ DB connection error: %v", err)
+    }
+    defer db.Close()
+
+    if err := database.RunMigrations(dsn); err != nil {
+        log.Fatalf("❌ Migration error: %v", err)
+    }
+
     port := os.Getenv("PORT")
     if port == "" {
         port = "8080"
